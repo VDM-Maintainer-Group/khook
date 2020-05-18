@@ -43,12 +43,23 @@ KHOOK_STUB_hook:
 	lock decl KHOOK_STUB_atomic_use_count(%rip)
 	ret
 #else
+.macro CALL_COPY_N_ARGS n
+	sub $(\n * 4), %esp
+	.set i, 0
+	.rept \n
+		mov ((\n + i + 1) * 4)(%esp), %eax
+		mov %eax, (i * 4)(%esp)
+		.set i, i + 1
+	.endr
+	mov $0xcacacaca, %eax
+	call *%eax
+	add $(\n * 4), %esp
+.endm
 KHOOK_STUB_hook:
 	call 1f
 1:	pop %eax
 	lock incl -(1b - KHOOK_STUB_atomic_use_count)(%eax)
-	mov $0xcacacaca, %eax
-	call *%eax
+	CALL_COPY_N_ARGS 8
 	call 1f
 1:	pop %ecx
 	lock decl -(1b - KHOOK_STUB_atomic_use_count)(%ecx)
