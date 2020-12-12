@@ -38,7 +38,9 @@ typedef struct {
 	extern r t(__VA_ARGS__);					\
 	KHOOK_(t, KHOOK_F_NOREF)
 
-#define KHOOK_ORIGIN(t, ...)						\
+#define KHOOK_ORIGIN(t, ...) KHOOK_ORIGIN_(t, __VA_ARGS__)
+
+#define KHOOK_ORIGIN_(t, ...)						\
 	((typeof(t) *)KHOOK_##t.orig)(__VA_ARGS__)
 
 extern int khook_init(void);
